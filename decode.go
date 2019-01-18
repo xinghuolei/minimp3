@@ -10,7 +10,7 @@ package minimp3
 
 int decode(mp3dec_t *dec, mp3dec_frame_info_t *info, unsigned char *data, int *length, unsigned char *decoded, int *decoded_length) {
     int samples;
-    short pcm[MINIMP3_MAX_SAMPLES_PER_FRAME];
+    mp3d_sample_t pcm[MINIMP3_MAX_SAMPLES_PER_FRAME];
     samples = mp3dec_decode_frame(dec, data, *length, pcm, info);
     *decoded_length = samples * info->channels * 2;
     *length -= info->frame_bytes;
