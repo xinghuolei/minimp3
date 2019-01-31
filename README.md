@@ -12,7 +12,7 @@ package main
 import (
 	"io/ioutil"
 
-	"github.com/tosone/minimp3"
+	"github.com/xinghuolei/minimp3"
 )
 
 func main() {

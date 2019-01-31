@@ -12,11 +12,11 @@ int decode(mp3dec_t *dec, mp3dec_frame_info_t *info, unsigned char *data, int *l
     int samples;
     mp3d_sample_t pcm[MINIMP3_MAX_SAMPLES_PER_FRAME];
     samples = mp3dec_decode_frame(dec, data, *length, pcm, info);
-    *decoded_length = samples * info->channels * 2;
+    *decoded_length = samples * info->channels * sizeof(mp3d_sample_t);
     *length -= info->frame_bytes;
-    unsigned char buffer[samples * info->channels * 2];
-    memcpy(buffer, (unsigned char*)&(pcm), sizeof(short) * samples * info->channels);
-    memcpy(decoded, buffer, sizeof(short) * samples * info->channels);
+    unsigned char buffer[samples * info->channels * sizeof(mp3d_sample_t)];
+    memcpy(buffer, (unsigned char*)&(pcm), sizeof(mp3d_sample_t) * samples * info->channels);
+    memcpy(decoded, buffer, sizeof(mp3d_sample_t) * samples * info->channels);
     return info->frame_bytes;
 }
 */
@@ -99,7 +99,7 @@ func NewDecoder(reader io.Reader) (dec *Decoder, err error) {
 				<-time.After(WaitForDataDuration)
 				continue
 			}
-			var decoded = [maxSamplesPerFrame * 2]byte{}
+			var decoded = [maxSamplesPerFrame * 4]byte{}
 			var decodedLength = C.int(0)
 			var length = C.int(len(dec.data))
 			if len(dec.data) == 0 {
@@ -179,7 +179,7 @@ func DecodeFull(mp3 []byte) (dec *Decoder, decodedData []byte, err error) {
 	info := C.mp3dec_frame_info_t{}
 	var length = C.int(len(mp3))
 	for {
-		var decoded = [maxSamplesPerFrame * 2]byte{}
+		var decoded = [maxSamplesPerFrame * 4]byte{}
 		var decodedLength = C.int(0)
 		frameSize := C.decode(&dec.decode,
 			&info, (*C.uchar)(unsafe.Pointer(&mp3[0])),
